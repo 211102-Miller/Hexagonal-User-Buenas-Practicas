@@ -3,23 +3,27 @@ import { LoginUserUseCase } from "../../application/UseCase/loginUserUseCase";
 import { User } from "../../domain/Entity/user";
 
 export class LoginUserController {
-    constructor (readonly loginUserUseCase: LoginUserUseCase){}
+    constructor(readonly loginUserUseCase: LoginUserUseCase) { }
 
-    async login(req:Request, res:Response){
+    async login(req: Request, res: Response) {
         try {
             let { email, password } = req.body;
 
-            const loginUser = await this.loginUserUseCase.login(email,password);
+            const loginUser = await this.loginUserUseCase.login(email, password);
 
             if (loginUser) {
-                const {token, user} = loginUser;
                 return res.status(201).send({
-                   token,
-                   user
+                    info: loginUser,
+                    
+                })
+            }
+            else {
+                return res.status(404).send({
+                    stauts: "Error"
                 })
             }
 
-            
+
         } catch (error) {
             if (error instanceof Error) {
                 if (error.message.startsWith('[')) {
@@ -29,7 +33,7 @@ export class LoginUserController {
                         errors: JSON.parse(error.message)
                     });
                 }
-            } 
+            }
             return res.status(500).send({
                 status: "error",
                 message: "An error occurred while delete the user."

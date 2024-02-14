@@ -9,19 +9,20 @@ export class RegisterUserController {
     async register(req: Request, res: Response) {
         let { name, lastName, cellphone, email, password } = req.body;
         try {
-            let user = await this.registerUserUseCase.run({ name, lastName, cellphone, email, password });
+
+            let user = await this.registerUserUseCase.run(name, lastName, cellphone, email, password);
 
             if (user) {
-                const apiKey = 're_94wkkd5X_Lw7P7P8zUPkDjb15RNvWm99Z';
-                const emailService = new EmailService(apiKey);
+                //const apiKey = 're_94wkkd5X_Lw7P7P8zUPkDjb15RNvWm99Z';
+                //const emailService = new EmailService(apiKey);
 
-                await emailService.run(user);
+                //wait emailService.run(user);
 
                 return res.status(201).send({
                     status: "succes",
                     data: {
                         uuid: user.uuid,
-                        fullName: user.contact.getFullName,
+                        Name: user.contact.name,
                         email: user.credential.email,
                         Token: user.status.activationToken
                     }

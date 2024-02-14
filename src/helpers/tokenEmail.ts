@@ -2,12 +2,11 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 
 
 
-export function generarToken(email) {
+export function generarToken(email:string) {
     const token = jwt.sign({ email }, 'secreto');
     return token;
 }; 
 
-// Función para verificar un token
 export function verificateToken(token: string): string | null {
     try {
         const decoded = jwt.verify(token, 'secreto') as JwtPayload;
@@ -17,8 +16,11 @@ export function verificateToken(token: string): string | null {
             return null;
         }
     } catch (error) {
-        // Manejar el error en caso de que el token no sea válido
-        console.error('Error al verificar el token:', error.message);
+        if (error instanceof Error) {
+            console.error('Error al verificar el token:', error.message);
+        } else {
+            console.error('Error al verificar el token:', error);
+        }
         return null;
     }
 }

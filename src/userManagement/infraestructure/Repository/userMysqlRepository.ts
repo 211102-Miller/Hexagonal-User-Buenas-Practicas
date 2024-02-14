@@ -32,23 +32,29 @@ export class UserMysqlRepository  implements UserInterface{
         }
     }
 
-    async verificateUser(token: string): Promise<string> {
+    async verificateUser(token: string): Promise<string | any> {
         try {
             // Verificar el token
-            const email = verificateToken(token);
+            const verifiToken = verificateToken(token);
     
-            if (email) {
+            if (verifiToken) {
                 // Si el token es válido, buscar el usuario por el token en la base de datos
                 const sql = "UPDATE user SET verifiedAt = NOW() WHERE activationToken = ?";
                 const params = [token];
                 const result = await query(sql, params);
-                
-                if (result instanceof Array && result.length > 0 && result[0] instanceof Object) {
-                    const affectedRows = result[0]['affectedRows']; 
     
-                    if (affectedRows && typeof affectedRows === 'number' && affectedRows > 0) {
-                        // Si se encontró y actualizó el usuario, retornar un mensaje de confirmación
-                        return "Usuario confirmado correctamente.";
+                // Verificar si el resultado es un array y tiene al menos un elemento
+                if (Array.isArray(result) && result.length > 0) {
+                    // Verificar si el primer elemento del array es un objeto y tiene la propiedad 'affectedRows'
+                    const firstResult = result[0];
+                    if (typeof firstResult === 'object' && 'affectedRows' in firstResult) {
+                        const affectedRows = firstResult['affectedRows'];
+    
+                        // Verificar si 'affectedRows' es un número y es mayor que 0
+                        if (typeof affectedRows === 'number' && affectedRows > 0) {
+                            // Si se encontró y actualizó el usuario, retornar un mensaje de confirmación
+                            return "Usuario confirmado correctamente.";
+                        }
                     }
                 }
             }
@@ -81,6 +87,7 @@ export class UserMysqlRepository  implements UserInterface{
             console.log("pasooo")
             // Verificar si el usuario ha sido verificado.
             if (!user.verifiedAt) {
+                console.log("anal")
                 return 'El usuario aún no ha verificado su cuenta';
             }
             console.log("pasooooooo")
@@ -104,7 +111,7 @@ export class UserMysqlRepository  implements UserInterface{
             const [blacklist]: any = await query('SELECT * FROM blacklist WHERE uuid = ? AND token = ?', [uuid, token]);
             if (blacklist && blacklist.length > 0) {
                 // Si el usuario ya está en la lista negra, no hacemos nada más
-                return { message: 'El usuario ya ha cerrado sesión' };
+                return { message: 'El usuario ya ha cerrado sesión, inicie sesion nuevamente' };
             }
     
             // Si el usuario no está en la lista negra, lo agregamos
