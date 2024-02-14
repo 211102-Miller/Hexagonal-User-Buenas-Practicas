@@ -6,10 +6,6 @@ export interface UserInterface{
 
     verificateUser(token:string):Promise<User | any | null | string>;
 
+    loginUser(email:string, password:string):Promise<User | any | string | null>;
 
-
-
-
-
-    
 }
