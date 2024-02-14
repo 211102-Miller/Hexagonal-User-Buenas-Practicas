@@ -1,21 +1,19 @@
 import { Request, Response } from "express";
-import { LoginUserUseCase } from "../../application/UseCase/loginUserUseCase";
-import { User } from "../../domain/Entity/user";
+import { LogoutUserUseCase } from "../../application/UseCase/logoutUserUseCase";
 
-export class LoginUserController {
-    constructor (readonly loginUserUseCase: LoginUserUseCase){}
+export class LogoutUserController{
 
-    async login(req:Request, res:Response){
+    constructor(readonly logoutUserUseCase:LogoutUserUseCase){}
+
+    async logout(req:Request, res:Response){
         try {
-            let { email, password } = req.body;
+            let { uuid, token} = req.body;
 
-            const loginUser = await this.loginUserUseCase.login(email,password);
+            const cerarr = await this.logoutUserUseCase.logout(uuid,token);
 
-            if (loginUser) {
-                const {token, user} = loginUser;
+            if (cerarr) {
                 return res.status(201).send({
-                   token,
-                   user
+                   cerarr
                 })
             }
 
@@ -36,4 +34,5 @@ export class LoginUserController {
             });
         }
     }
+
 }

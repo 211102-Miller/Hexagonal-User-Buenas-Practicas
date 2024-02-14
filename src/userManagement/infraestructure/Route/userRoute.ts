@@ -1,5 +1,7 @@
-import { registerUserController, verificateUserController, loginUserController } from "../dependencies";
+import { registerUserController, verificateUserController, loginUserController, logoutUserController } from "../dependencies";
 import express  from "express";
+import { validateToken } from "../../../helpers/verificateToken";
+
 
 export const userRouter = express.Router();
 
@@ -10,4 +12,6 @@ userRouter.put("/:token/activate", verificateUserController.update.bind(verifica
 
 userRouter.post("/login", loginUserController.login.bind(loginUserController));
 
+userRouter.use(validateToken);
 
+userRouter.post("/logout", logoutUserController.logout.bind(logoutUserController));

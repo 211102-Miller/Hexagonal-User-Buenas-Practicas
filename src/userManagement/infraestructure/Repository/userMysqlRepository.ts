@@ -60,7 +60,7 @@ export class UserMysqlRepository  implements UserInterface{
         }
     }
 
-    async loginUser(email: string, password: string): Promise<string | null> {
+    async loginUser(email: string, password: string): Promise<{ token: string, user: User }|string | null> {
         try {
             // Primero, obtener el usuario por email.
             const [users]: any = await query('SELECT * FROM user WHERE email = ? LIMIT 1', [email]);
@@ -91,11 +91,30 @@ export class UserMysqlRepository  implements UserInterface{
             const token: string = tokenSigIn(user.uuid, user.email);
             console.log("pasooo")
 
-            return token;
+            return {token, user};
 
         } catch (error) {
             console.error('Error durante el inicio de sesión:', error);
             throw error;
         }
     }
+    async logoutUser(uuid: string, token: string): Promise<any> {
+        try {
+            // Primero, verificamos si el usuario ya ha cerrado sesión
+            const [blacklist]: any = await query('SELECT * FROM blacklist WHERE uuid = ? AND token = ?', [uuid, token]);
+            if (blacklist && blacklist.length > 0) {
+                // Si el usuario ya está en la lista negra, no hacemos nada más
+                return { message: 'El usuario ya ha cerrado sesión' };
+            }
+    
+            // Si el usuario no está en la lista negra, lo agregamos
+            await query('INSERT INTO blacklist (uuid, token) VALUES (?, ?)', [uuid, token]);
+    
+            return { message: 'El usuario ha cerrado sesión exitosamente' };
+        } catch (error) {
+            console.error('Error al cerrar sesión del usuario:', error);
+            throw error;
+        }
+    }
+    
 }

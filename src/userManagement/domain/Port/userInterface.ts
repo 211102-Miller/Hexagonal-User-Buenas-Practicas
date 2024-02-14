@@ -8,4 +8,6 @@ export interface UserInterface{
 
     loginUser(email:string, password:string):Promise<User | any | string | null>;
 
+    logoutUser(uuid:string, token:string):Promise<User | any | string |null>;
+
 }
